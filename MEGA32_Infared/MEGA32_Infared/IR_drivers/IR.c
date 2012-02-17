@@ -14,10 +14,30 @@ char adr; // 5 bit
 char cmd; // 6 bit
 bool hold_bit;
 
+#define INPUT_INTERRUPT INT0
+
 void ir_init()
 {
-	//Setup interrupt 0
+	//Setup interrupt
+	GICR |= 1 << INPUT_INTERRUPT;
+	
+	if(INPUT_INTERRUPT == INT0)
+	{
+		MCUCR |= 1 << 0;
+		MCUCR |= 1 << 1;
+	}
+	else if(INPUT_INTERRUPT == INT1)
+	{
+		MCUCR |= 1 << 2;
+		MCUCR |= 1 << 3;
+	}
+	else
+	{
+		MCUCSR |= 0 << 6;
+	}
+	
 	//Setup Timer0 + timer0 interrupt
+	TCCR0 = 0b00000000;
 }
 
 void ir_receive(char* _adr, char* _cmd, bool _hold_bit)
