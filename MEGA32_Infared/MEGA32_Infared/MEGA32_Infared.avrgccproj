@@ -79,6 +79,12 @@
     <Compile Include="Drivers\uart.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="IR_drivers\IR.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="IR_drivers\IR.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="MEGA32_Infared.c">
       <SubType>compile</SubType>
     </Compile>
