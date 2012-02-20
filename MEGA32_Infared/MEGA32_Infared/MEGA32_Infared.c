@@ -6,11 +6,15 @@
  */ 
 
 #include <avr/io.h>
+#include "IR.h"
+#include "uart.h"
 
 int main(void)
 {
+	ir_init();
+	InitUART(9600,8);
     while(1)
     {
-        //TODO:: Please write your application code 
+         
     }
 }

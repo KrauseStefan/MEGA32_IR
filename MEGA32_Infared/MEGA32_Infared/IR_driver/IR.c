@@ -7,8 +7,10 @@
 
 #include "IR.h"
 #include <avr/interrupt.h>
+#include <limits.h>
 
 #define INPUT_INTERRUPT				INT0
+#define INPUT_PIN					~(PIND & (1<<PIND2))  // returns either 0 or 4
 #define ENABLE_INPUT_INTERRUPT		GICR |= 1 << INPUT_INTERRUPT
 #define DISABLE_INPUT_INTERRUPT		GICR |= 0 << INPUT_INTERRUPT
 
@@ -19,17 +21,27 @@
 
 #define NUMBER_OF_MEASURINGS		24
 
+typedef enum{
+	FIRST_MEASURMENTS,
+	ZERO_BIT,
+	ONE_BIT,
+	CALULATE
+}INPUT_STATE;
+
 int half_bit_time;
 int three_quarter_bit_time;
 char adr; // 5 bit
 char cmd; // 6 bit
 bool hold_bit;
+bool zero_value_bit;
+bool one_value_bit;
+
+INPUT_STATE input_state;
 
 bool first_start_bit;
 int meaurering_count;
 
-
-
+void invalid_input();
 
 void ir_init()
 {
@@ -57,10 +69,10 @@ void ir_init()
 	//Prescaler 256
 	// Normal mode
 	// Normal compare mode
-	TCCR0 = 0b00000100;	
+	TCCR0 = 0b00000100;
 }
 
-void ir_receive(char* _adr, char* _cmd, bool _hold_bit)
+void ir_receive(char* _adr, char* _cmd, bool* _hold_bit)
 {
 	//Tjek for invalid data first
 	*_adr = adr;
@@ -83,9 +95,10 @@ ISR (INT0_vect)
 		bit_time = TIMER0_COMP_REG;
 		TIMER0_COUNT_REG = 0;
 		half_bit_time = bit_time/2;
-		three_quarter_bit_time = float(bit_time/4*3);
+		three_quarter_bit_time = (float)(bit_time/4*3);
 		TIMER0_COMP_REG = three_quarter_bit_time;
 		meaurering_count = 0;
+		input_state = FIRST_MEASURMENTS;
 		DISABLE_INPUT_INTERRUPT;
 	}
 	// Measure time between the 2 start bits
@@ -96,28 +109,58 @@ ISR (INT0_vect)
 
 ISR (TIMER0_COMP_vect)
 {
-	//SKAL VI STOPPE MED AT TÆLLE/LÆSE NÅR VI HAR LÆST 24 GANGE?
-	TIMER0_COUNT_REG = 0;
-	if(meaurering_count > 0 && meaurering_count < NUMBER_OF_MEASURINGS)
+	if(meaurering_count >= 0 && meaurering_count < NUMBER_OF_MEASURINGS)
 	{
-		//READ INPUT VALUE
-		meaurering_count++
+		TIMER0_COUNT_REG = 0;
+		switch(input_state)
+		{
+			case FIRST_MEASURMENTS:
+				TIMER0_COUNT_REG = half_bit_time;
+				zero_value_bit = INPUT_PIN;
+				meaurering_count++;
+				input_state = ONE_BIT;
+				break;
+			case ZERO_BIT:
+				zero_value_bit = INPUT_PIN;
+				meaurering_count++;
+				input_state = ONE_BIT;
+				break;
+			case ONE_BIT:
+				one_value_bit = INPUT_PIN;
+				if(zero_value_bit != one_value_bit)
+				{
+					int temp = meaurering_count/2;
+					if(temp == 0)
+					{
+						hold_bit = one_value_bit;
+					}
+					else if(temp <= 5 && temp > 0)
+					{
+						adr |= one_value_bit << temp;
+					}
+					else if(temp <= 11 && temp > 0)
+					{
+						cmd |= one_value_bit << (temp-5);
+					}
+					else
+					{
+						invalid_input();
+					}
+				}
+				else
+				{
+					invalid_input();
+				}
+				meaurering_count++;
+				input_state == ZERO_BIT;
+				break;
+			default:
+				break;
+		}
 	}
-	else if(meaurering_count == 0)
-	{
-		TIMER0_COMP_REG = half_bit_time;
-		//READ INPUT VALUE
-		meaurering_count++;
-	}
-	else
-	{
-		// INVALID DATA
-		// output invalidt message
-	}
-	// Set Compare register OCR0 first time there is Interrupt
-	// Reset timer register TCNT0
-	// Read input value
-	// Increase a counter
-	// after 24 times
-	// Invalid data?
+}
+
+void invalid_input()
+{
+	// print invalid input! ! ! !
 }

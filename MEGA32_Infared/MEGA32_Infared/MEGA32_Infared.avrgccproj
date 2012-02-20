@@ -79,6 +79,12 @@
     <Compile Include="Drivers\uart.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="IR.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="IR.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="IR_drivers\IR.c">
       <SubType>compile</SubType>
     </Compile>
@@ -91,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Drivers" />
-    <Folder Include="IR_drivers" />
+    <Folder Include="IR_driver" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\AvrGCC.targets" />
 </Project>

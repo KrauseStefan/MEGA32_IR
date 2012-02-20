@@ -8,5 +8,7 @@ Drivers\lcd162.c
 
 Drivers\uart.c
 
+IR_drivers\IR.c
+
 MEGA32_Infared.c
 
