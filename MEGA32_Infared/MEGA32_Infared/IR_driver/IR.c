@@ -22,6 +22,8 @@
 #define ENABLE_INPUT_INTERRUPT		GICR |= (0b00000001 << 6)
 #define DISABLE_INPUT_INTERRUPT		GICR &= (0b11111110 << 6)
 
+#define ENABLE_TIMER0_OVERFLOW_INT	TIMSK |= 0b00000001;
+#define DISABL_TIMER0_OVERFLOW_INT	TIMSK &= 0b11111110;
 #define ENABLE_TIMER0_COMP_INT		TIMSK |= (0b00000001 << 1)
 #define DISABLE_TIMER0_COMP_INT		TIMSK &= (0b11111110 << 1)
 #define TIMER0_COUNT_REG			TCNT0
@@ -96,9 +98,8 @@ ISR (INT0_vect)
 	int bit_time;
 	if(first_start_bit)
 	{
-		TIMER0_COMP_REG = 255;
 		TIMER0_COUNT_REG = 0;
-		ENABLE_TIMER0_COMP_INT;
+		ENABLE_TIMER0_OVERFLOW_INT;
 		first_start_bit = !first_start_bit;
 #ifdef LED_DEBUG
 	led++;
@@ -109,11 +110,14 @@ ISR (INT0_vect)
 		bit_time = TIMER0_COMP_REG;
 		TIMER0_COUNT_REG = 0;
 		half_bit_time = bit_time/2;
-		three_quarter_bit_time = (float)(bit_time/4*3);
+		three_quarter_bit_time = (bit_time/4.0*3.0);
 		TIMER0_COMP_REG = three_quarter_bit_time;
 		meaurering_count = 0;
 		input_state = FIRST_MEASURMENTS;
+		ENABLE_TIMER0_COMP_INT;
+		DISABL_TIMER0_OVERFLOW_INT;
 		DISABLE_INPUT_INTERRUPT;
+		first_start_bit = true;
 	}
 	// Measure time between the 2 start bits
 	// calculate half and quarter bit time
@@ -195,4 +199,14 @@ ISR (TIMER0_COMP_vect)
 				break;
 		}
 	}
+}
+
+ISR (TIMER0_OVF_vect)
+{
+	if (*ir_error_msg != NULL)
+	{
+		ir_error_msg("\nTime out\n");
+	}
+	first_start_bit = true;
+	DISABL_TIMER0_OVERFLOW_INT;
 }
