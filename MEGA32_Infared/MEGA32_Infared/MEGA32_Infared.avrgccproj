@@ -73,6 +73,12 @@
     <Compile Include="Drivers\lcd162.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Drivers\led.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\led.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drivers\uart.c">
       <SubType>compile</SubType>
     </Compile>

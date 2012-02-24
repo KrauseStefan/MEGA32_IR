@@ -48,6 +48,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../Drivers/I2C.c \
 ../Drivers/lcd162.c \
+../Drivers/led.c \
 ../Drivers/uart.c \
 ../IR_driver/IR.c \
 ../MEGA32_Infared.c
@@ -62,6 +63,7 @@ ASM_SRCS +=
 OBJS +=  \
 Drivers/I2C.o \
 Drivers/lcd162.o \
+Drivers/led.o \
 Drivers/uart.o \
 IR_driver/IR.o \
 MEGA32_Infared.o
@@ -70,6 +72,7 @@ MEGA32_Infared.o
 OBJS_AS_ARGS +=  \
 Drivers/I2C.o \
 Drivers/lcd162.o \
+Drivers/led.o \
 Drivers/uart.o \
 IR_driver/IR.o \
 MEGA32_Infared.o
@@ -78,6 +81,7 @@ MEGA32_Infared.o
 C_DEPS +=  \
 Drivers/I2C.d \
 Drivers/lcd162.d \
+Drivers/led.d \
 Drivers/uart.d \
 IR_driver/IR.d \
 MEGA32_Infared.d
@@ -86,6 +90,7 @@ MEGA32_Infared.d
 C_DEPS_AS_ARGS +=  \
 Drivers/I2C.d \
 Drivers/lcd162.d \
+Drivers/led.d \
 Drivers/uart.d \
 IR_driver/IR.d \
 MEGA32_Infared.d
@@ -118,6 +123,8 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_F
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
+
+
 
 
 

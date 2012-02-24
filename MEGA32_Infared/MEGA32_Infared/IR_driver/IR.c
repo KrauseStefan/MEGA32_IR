@@ -8,14 +8,22 @@
 #include "IR.h"
 #include <avr/interrupt.h>
 #include <limits.h>
+#include <stdlib.h>
+
+
+#define LED_DEBUG
+#ifdef LED_DEBUG
+	#include "../Drivers/led.h"
+	unsigned char led = 0;
+#endif
 
 #define INPUT_INTERRUPT				INT0
 #define INPUT_PIN					~(PIND & (1<<PIND2))  // returns either 0 or 4
-#define ENABLE_INPUT_INTERRUPT		GICR |= 1 << INPUT_INTERRUPT
-#define DISABLE_INPUT_INTERRUPT		GICR |= 0 << INPUT_INTERRUPT
+#define ENABLE_INPUT_INTERRUPT		GICR |= (0b00000001 << 6)
+#define DISABLE_INPUT_INTERRUPT		GICR &= (0b11111110 << 6)
 
-#define ENABLE_TIMER0_COMP_INT		TIMSK |= 1 << 1 // TJEK AT DET ER RIGTIG BIT!
-#define DISABLE_TIMER0_COMP_INT		TIMSK |= 0 << 1
+#define ENABLE_TIMER0_COMP_INT		TIMSK |= (0b00000001 << 1)
+#define DISABLE_TIMER0_COMP_INT		TIMSK &= (0b11111110 << 1)
 #define TIMER0_COUNT_REG			TCNT0
 #define TIMER0_COMP_REG				OCR0
 
@@ -25,14 +33,14 @@ typedef enum{
 	FIRST_MEASURMENTS,
 	ZERO_BIT,
 	ONE_BIT,
-	CALULATE
+	RECEIVING_DONE
 }INPUT_STATE;
 
 int half_bit_time;
 int three_quarter_bit_time;
-char adr; // 5 bit
-char cmd; // 6 bit
-bool hold_bit;
+
+IR_TRANSMISION_DATA_S ir_data;
+
 bool zero_value_bit;
 bool one_value_bit;
 
@@ -40,8 +48,6 @@ INPUT_STATE input_state;
 
 bool first_start_bit;
 int meaurering_count;
-
-void invalid_input();
 
 void ir_init()
 {
@@ -70,14 +76,18 @@ void ir_init()
 	// Normal mode
 	// Normal compare mode
 	TCCR0 = 0b00000100;
+	
+#ifdef LED_DEBUG
+	initLEDport(led);
+	led++;
+	writeLEDpattern(led);
+#endif
 }
 
-void ir_receive(char* _adr, char* _cmd, bool* _hold_bit)
+void ir_receive(IR_TRANSMISION_DATA_S* _ir_data)
 {
 	//Tjek for invalid data first
-	*_adr = adr;
-	*_cmd = cmd;
-	*_hold_bit = hold_bit;
+	*_ir_data = ir_data;
 }
 
 //Input interrupt
@@ -90,6 +100,10 @@ ISR (INT0_vect)
 		TIMER0_COUNT_REG = 0;
 		ENABLE_TIMER0_COMP_INT;
 		first_start_bit = !first_start_bit;
+#ifdef LED_DEBUG
+	led++;
+	writeLEDpattern(led);
+#endif
 	}
 	else{
 		bit_time = TIMER0_COMP_REG;
@@ -132,35 +146,53 @@ ISR (TIMER0_COMP_vect)
 					int temp = meaurering_count/2;
 					if(temp == 0)
 					{
-						hold_bit = one_value_bit;
+						ir_data.hold_bit = one_value_bit;
 					}
 					else if(temp <= 5 && temp > 0)
 					{
-						adr |= one_value_bit << temp;
+						ir_data.adr |= one_value_bit << temp;
 					}
 					else if(temp <= 11 && temp > 0)
 					{
-						cmd |= one_value_bit << (temp-5);
+						ir_data.cmd |= one_value_bit << (temp-5);
 					}
 					else
 					{
-						invalid_input();
+						if (*ir_error_msg != NULL)
+						{
+							ir_error_msg("\nToo many bytes received\n");
+						}
 					}
 				}
 				else
 				{
-					invalid_input();
+					if (*ir_error_msg != NULL)
+					{
+						ir_error_msg("\nBoth high/low bits\n");
+					}
 				}
-				meaurering_count++;
-				input_state == ZERO_BIT;
+				
+				if(meaurering_count != NUMBER_OF_MEASURINGS-1)
+				{
+					meaurering_count++;
+					input_state = ZERO_BIT;
+				}
+				else
+				{
+					meaurering_count = 0;
+					input_state = RECEIVING_DONE;
+				}					
+				break;
+			case RECEIVING_DONE:
+				if(*ir_receive_event != NULL)
+				{
+					ir_receive_event(ir_data);
+				}
+				ENABLE_INPUT_INTERRUPT;
+				DISABLE_TIMER0_COMP_INT;
 				break;
 			default:
 				break;
 		}
 	}
-}
-
-void invalid_input()
-{
-	// print invalid input! ! ! !
 }

@@ -6,6 +6,8 @@ Drivers\I2C.c
 
 Drivers\lcd162.c
 
+Drivers\led.c
+
 Drivers\uart.c
 
 IR_driver\IR.c
