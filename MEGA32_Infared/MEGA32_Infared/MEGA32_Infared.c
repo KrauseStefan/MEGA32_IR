@@ -6,8 +6,8 @@
  */ 
 
 #include <avr/io.h>
-#include "IR.h"
-#include "uart.h"
+#include "IR_driver/IR.h"
+#include "Drivers/uart.h"
 
 int main(void)
 {

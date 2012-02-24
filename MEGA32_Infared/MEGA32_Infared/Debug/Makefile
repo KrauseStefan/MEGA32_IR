@@ -41,7 +41,7 @@ OUTPUT_FILE_DEP:=
 # Every subdirectory with source files must be described here
 SUBDIRS :=  \
 ../Drivers \
-../IR_drivers
+../IR_driver
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
@@ -49,7 +49,7 @@ C_SRCS +=  \
 ../Drivers/I2C.c \
 ../Drivers/lcd162.c \
 ../Drivers/uart.c \
-../IR_drivers/IR.c \
+../IR_driver/IR.c \
 ../MEGA32_Infared.c
 
 
@@ -63,7 +63,7 @@ OBJS +=  \
 Drivers/I2C.o \
 Drivers/lcd162.o \
 Drivers/uart.o \
-IR_drivers/IR.o \
+IR_driver/IR.o \
 MEGA32_Infared.o
 
 
@@ -71,7 +71,7 @@ OBJS_AS_ARGS +=  \
 Drivers/I2C.o \
 Drivers/lcd162.o \
 Drivers/uart.o \
-IR_drivers/IR.o \
+IR_driver/IR.o \
 MEGA32_Infared.o
 
 
@@ -79,7 +79,7 @@ C_DEPS +=  \
 Drivers/I2C.d \
 Drivers/lcd162.d \
 Drivers/uart.d \
-IR_drivers/IR.d \
+IR_driver/IR.d \
 MEGA32_Infared.d
 
 
@@ -87,7 +87,7 @@ C_DEPS_AS_ARGS +=  \
 Drivers/I2C.d \
 Drivers/lcd162.d \
 Drivers/uart.d \
-IR_drivers/IR.d \
+IR_driver/IR.d \
 MEGA32_Infared.d
 
 
@@ -135,7 +135,7 @@ Drivers/%.o: ../Drivers/%.c
 	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -O0 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega32   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
-IR_drivers/%.o: ../IR_drivers/%.c
+IR_driver/%.o: ../IR_driver/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
 	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -O0 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega32   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"

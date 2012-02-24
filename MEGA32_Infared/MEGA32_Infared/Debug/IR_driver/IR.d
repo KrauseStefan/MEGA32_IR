@@ -1,4 +1,4 @@
-IR_drivers/IR.d IR_drivers/IR.o: ../IR_drivers/IR.c ../IR_drivers/IR.h \
+IR_driver/IR.d IR_driver/IR.o: ../IR_driver/IR.c ../IR_driver/IR.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdbool.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/avr/interrupt.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/avr/io.h \
@@ -14,7 +14,7 @@ IR_drivers/IR.d IR_drivers/IR.o: ../IR_drivers/IR.c ../IR_drivers/IR.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/avr/lock.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include-fixed/limits.h
 
-../IR_drivers/IR.h:
+../IR_driver/IR.h:
 
 c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdbool.h:
 
