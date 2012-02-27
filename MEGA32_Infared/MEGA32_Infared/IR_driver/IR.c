@@ -8,7 +8,12 @@
 #include "IR.h"
 #include <avr/interrupt.h>
 #include <limits.h>
-#include <stdlib.h>
+#include <stdio.h>
+
+//#define PRINT_DEBUG
+#ifdef PRINT_DEBUG
+	#include "../Drivers/uart.h"
+#endif
 
 
 #define LED_DEBUG
@@ -18,7 +23,7 @@
 #endif
 
 #define INPUT_INTERRUPT				INT0
-#define INPUT_PIN					~(PIND & (1<<PIND2))  // returns either 0 or 4
+#define INPUT_PIN					~(PIND & (1<<2))  // returns either 0 or 4 PIND2
 #define ENABLE_INPUT_INTERRUPT		GICR |= (0b00000001 << 6)
 #define DISABLE_INPUT_INTERRUPT		GICR &= (0b11111110 << 6)
 
@@ -45,6 +50,7 @@ IR_TRANSMISION_DATA_S ir_data;
 
 bool zero_value_bit;
 bool one_value_bit;
+int times_of_timer_overflow;
 
 INPUT_STATE input_state;
 
@@ -74,10 +80,10 @@ void ir_init()
 	first_start_bit = true;
 	
 	//Setup Timer0
-	//Prescaler 256
+	//Prescaler 64
 	// Normal mode
 	// Normal compare mode
-	TCCR0 = 0b00000100;
+	TCCR0 = 0b00000011;
 	
 #ifdef LED_DEBUG
 	initLEDport(led);
@@ -101,28 +107,43 @@ ISR (INT0_vect)
 		TIMER0_COUNT_REG = 0;
 		ENABLE_TIMER0_OVERFLOW_INT;
 		first_start_bit = !first_start_bit;
+		times_of_timer_overflow = 0;
 #ifdef LED_DEBUG
 	led++;
 	writeLEDpattern(led);
 #endif
 	}
 	else{
-		bit_time = TIMER0_COMP_REG;
+		bit_time = TIMER0_COUNT_REG;
 		TIMER0_COUNT_REG = 0;
+		DISABL_TIMER0_OVERFLOW_INT;
+		bit_time += 256*times_of_timer_overflow;
 		half_bit_time = bit_time/2;
 		three_quarter_bit_time = (bit_time/4.0*3.0);
+#ifdef PRINT_DEBUG
+	SendString("\n\rhalf bit time is: ");
+	SendInteger(half_bit_time);
+	SendString("\n\rThree quarter bit time is: ");
+	SendInteger(three_quarter_bit_time);
+	SendString("\n\rTimer count register: ");
+	SendInteger(bit_time - (256*times_of_timer_overflow));
+	SendString("\n\rtimer overflow is: ");
+	SendInteger(times_of_timer_overflow);
+	SendString("\n\r");
+	/*if (*ir_error_msg != NULL)
+	{
+		char* output;
+		sprintf(output, ", half_bit_time, three_quarter_bit_time);
+		ir_error_msg(output);
+	}*/
+#endif
 		TIMER0_COMP_REG = three_quarter_bit_time;
 		meaurering_count = 0;
 		input_state = FIRST_MEASURMENTS;
 		ENABLE_TIMER0_COMP_INT;
-		DISABL_TIMER0_OVERFLOW_INT;
 		DISABLE_INPUT_INTERRUPT;
 		first_start_bit = true;
 	}
-	// Measure time between the 2 start bits
-	// calculate half and quarter bit time
-	// Enable timer0 interrupt
-	// start timer 0 to measure first time after 3 quarter bit time
 }
 
 ISR (TIMER0_COMP_vect)
@@ -133,7 +154,7 @@ ISR (TIMER0_COMP_vect)
 		switch(input_state)
 		{
 			case FIRST_MEASURMENTS:
-				TIMER0_COUNT_REG = half_bit_time;
+				TIMER0_COMP_REG = half_bit_time;
 				zero_value_bit = INPUT_PIN;
 				meaurering_count++;
 				input_state = ONE_BIT;
@@ -164,7 +185,7 @@ ISR (TIMER0_COMP_vect)
 					{
 						if (*ir_error_msg != NULL)
 						{
-							ir_error_msg("\nToo many bytes received\n");
+							ir_error_msg("\n\rToo many bytes received\n\r");
 						}
 					}
 				}
@@ -172,7 +193,18 @@ ISR (TIMER0_COMP_vect)
 				{
 					if (*ir_error_msg != NULL)
 					{
-						ir_error_msg("\nBoth high/low bits\n");
+#ifdef PRINT_DEBUG
+						/*char* output;
+						sprintf(output, "Values of bits: %i\n\r", one_value_bit);
+						ir_error_msg("\n\rBoth high/low bits\n\r");
+						ir_error_msg(output);*/
+						SendString("\n\rBoth high/low bits\n\r");
+						SendString("Values of bits: ");
+						SendInteger(one_value_bit);
+						SendString("\n\r");
+#else
+						ir_error_msg("\n\rBoth high/low bits\n\r");
+#endif
 					}
 				}
 				
@@ -203,10 +235,19 @@ ISR (TIMER0_COMP_vect)
 
 ISR (TIMER0_OVF_vect)
 {
-	if (*ir_error_msg != NULL)
+	if(times_of_timer_overflow == 3)
 	{
-		ir_error_msg("\nTime out\n");
+		if (*ir_error_msg != NULL)
+		{
+			ir_error_msg("\n\rTime out\n\r");
+		}
+		first_start_bit = true;
+		DISABL_TIMER0_OVERFLOW_INT;
+		times_of_timer_overflow = 0;
 	}
-	first_start_bit = true;
-	DISABL_TIMER0_OVERFLOW_INT;
+	else
+	{
+		times_of_timer_overflow++;
+	}
+	
 }
