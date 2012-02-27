@@ -52,7 +52,7 @@ void UartOutput(IR_TRANSMISION_DATA_S ir_data)
 	SendString("\n\rCommand: ");
 	SendChar(ir_data.cmd);
 	SendString("\n\rBit hold: ");
-	if(ir_data.hold_bit)
+	if(ir_data.hold_bit == false)
 	{
 		SendString("Button has not been hold\n\r");
 	}

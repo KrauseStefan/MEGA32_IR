@@ -16,7 +16,7 @@ IR_driver/IR.d IR_driver/IR.o: ../IR_driver/IR.c ../IR_driver/IR.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdio.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdarg.h \
  c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stddef.h \
- ../IR_driver/../Drivers/uart.h ../IR_driver/../Drivers/led.h
+ ../IR_driver/../Drivers/led.h
 
 ../IR_driver/IR.h:
 
@@ -53,7 +53,5 @@ c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/av
 c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdarg.h:
 
 c:\program\ files\ (x86)\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stddef.h:
-
-../IR_driver/../Drivers/uart.h:
 
 ../IR_driver/../Drivers/led.h:
