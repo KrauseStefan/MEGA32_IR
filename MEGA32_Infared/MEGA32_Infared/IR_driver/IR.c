@@ -18,14 +18,14 @@
 
 //#define LED_DEBUG
 //#define TIMER_LED_DEBUG
-#define PRINT_LED_DEBUG
+//#define PRINT_LED_DEBUG
 #if defined (LED_DEBUG) || defined(PRINT_LED_DEBUG) || defined(TIMER_LED_DEBUG)
 	#include "../Drivers/led.h"
 	unsigned char led = 0;
 #endif
 
 #define INPUT_INTERRUPT				INT0
-#define INPUT_PIN					~(PIND & (1 << PIND2))  // returns either 0 or 4 PIND2
+#define INPUT_PIN					((PIND & (1 << PIND2)) >> PIND2)  // returns either 0 or 4 PIND2
 #define ENABLE_INPUT_INTERRUPT		GICR |= (0b00000001 << INT0) // 6
 #define DISABLE_INPUT_INTERRUPT		GICR &= (0b11111110 << INT0)	// 6
 
@@ -124,13 +124,14 @@ ISR (INT0_vect)
 #endif
 
 #ifdef PRINT_DEBUG
-	SendString("\n\rhalf bit time is: ");
+	SendString("\n\rFrom interrupt routine", -1);
+	SendString("\n\rhalf bit time is: ", -1);
 	SendInteger(half_bit_time);
-	SendString("\n\rThree quarter bit time is: ");
+	SendString("\n\rThree quarter bit time is: ", -1);
 	SendInteger(three_quarter_bit_time);
-	SendString("\n\rTimer count register: ");
-	SendInteger(bit_time));
-	SendString("\n\r");
+	SendString("\n\rTimer count register: ", -1);
+	SendInteger(bit_time);
+	SendString("\n\r", -1);
 #endif
 	}
 }
@@ -183,10 +184,11 @@ ISR (TIMER0_COMP_vect)
 					if (*ir_error_msg != NULL)
 					{
 #ifdef PRINT_DEBUG
-	SendString("\n\rBoth high/low bits\n\r");
-	SendString("Values of bits: ");
+	SendString("\n\rFrom timer irq", -1);
+	SendString("\n\rBoth high/low bits\n\r", -1);
+	SendString("Values of bits: ", -1);
 	SendInteger(one_value_bit);
-	SendString("\n\r");
+	SendString("\n\r", -1);
 #else
 						//ir_error_msg("\n\rBoth high/low bits\n\r");
 #endif

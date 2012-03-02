@@ -43,7 +43,7 @@ int main(void)
 
 void ErrorData(char* message)
 {
-	SendString(message);
+	SendString(message, -1);
 }
 
 void input_handler(IR_TRANSMISION_DATA_S ir_data)
@@ -53,18 +53,18 @@ void input_handler(IR_TRANSMISION_DATA_S ir_data)
 
 void UartOutput(IR_TRANSMISION_DATA_S ir_data)
 {
-	SendString("\n\rAdr: ");
-	SendChar(ir_data.adr);
-	SendString("\n\rCommand: ");
-	SendChar(ir_data.cmd);
-	SendString("\n\rBit hold: ");
+	SendString("\n\rAdr: ", -1);
+	SendInteger(ir_data.adr);
+	SendString("\n\rCommand: ", -1);
+	SendInteger(ir_data.cmd);
+	SendString("\n\rBit hold: ", -1);
 	if(ir_data.hold_bit == false)
 	{
-		SendString("Button has not been hold\n\r");
+		SendString("Button has not been hold\n\r", -1);
 	}
 	else
 	{
-		SendString("Button has been hold\n\r");
+		SendString("Button has been hold\n\r", -1);
 	}
 	
 }
