@@ -7,6 +7,10 @@
  *
  * UART TXD --> PIND1
  * UART RXD --> PIND
+ * 
+ * IR Vcc (red) --> VTG PORTD
+ * IR GND (blue/black) --> GND PORTD
+ * IR data (green/purple) --> PIND2
  */ 
 
 #include <avr/io.h>
@@ -24,6 +28,8 @@ int main(void)
 	DDRD = 0b00000010;
 	ir_init();
 	InitUART(9600,8);
+	char * test = "HEJ med dig";
+	printf(test);
 	ir_receive_event = &input_handler;
 	ir_error_msg = &ErrorData;
 	sei(); // enable global interrupt
