@@ -135,7 +135,9 @@ Parameter:
    int: Number of characters excluding 0 termination. (can be set to -1 if needed.)
 *************************************************************************/
 void SendString(char* String, int length)
-{  
+{ 
+  if((inputNum+1) == sendNum )
+	return;
   if(length <= 0){
 	  length = strlen(String);
   }

@@ -10,7 +10,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-//#define PRINT_DEBUG
+#define PRINT_DEBUG
 #ifdef PRINT_DEBUG
 	#include "../Drivers/uart.h"
 #endif
