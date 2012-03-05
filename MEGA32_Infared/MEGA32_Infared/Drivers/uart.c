@@ -138,6 +138,7 @@ void SendString(char* String, int length)
 { 
   if((inputNum+1) == sendNum )
 	return;
+	
   if(length <= 0){
 	  length = strlen(String);
   }
