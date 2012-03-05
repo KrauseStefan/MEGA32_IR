@@ -10,7 +10,15 @@
 #include <limits.h>
 #include <stdio.h>
 
+<<<<<<< HEAD
 #define LED_DEBUG
+=======
+#define PRINT_DEBUG
+#ifdef PRINT_DEBUG
+	#include "../Drivers/uart.h"
+#endif
+
+>>>>>>> 9ca087fcfe2111e8394aa1bd97beab9cea6634d5
 
 #ifdef LED_DEBUG
 	#include "../Drivers/led.h"
