@@ -22,6 +22,7 @@
 void ErrorData(char* message);
 void input_handler(IR_TRANSMISION_DATA_S ir_data);
 void UartOutput(IR_TRANSMISION_DATA_S ir_data);
+void inputTest(char* input);
 
 int main(void)
 {
@@ -32,13 +33,19 @@ int main(void)
 	printf(test);
 	ir_receive_event = &input_handler;
 	ir_error_msg = &ErrorData;
+	ir_receive_input = &inputTest;
 	sei(); // enable global interrupt
 	//SendString("IR ready!\n\r");
     while(1)
     {
-         
+				 
     }
 	cli(); // disable global interrupt
+}
+
+void inputTest(char* input)
+{
+	SendString(input, -1);
 }
 
 void ErrorData(char* message)
