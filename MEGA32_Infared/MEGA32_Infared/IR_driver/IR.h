@@ -9,6 +9,9 @@
 
 #include <stdbool.h>
 
+char inputData[24];
+char inputs[24];
+
 typedef struct  
 {
 	char adr; // 5 bit
@@ -22,5 +25,6 @@ void ir_init();
 void ir_receive(IR_TRANSMISION_DATA_S* ir_data);
 void (*ir_receive_event)(IR_TRANSMISION_DATA_S ir_data);
 void (*ir_error_msg)(char* message);
+void (*ir_receive_input)(char* input);
 
 #endif
