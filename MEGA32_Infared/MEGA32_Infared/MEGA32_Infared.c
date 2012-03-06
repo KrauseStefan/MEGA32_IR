@@ -79,7 +79,18 @@ void ErrorData(char* message)
 
 void input_handler(IR_TRANSMISION_DATA_S ir_data)
 {
+	LCDGotoXY(0,0);
+	LCDDispString("                    ");	
+
+	char *str = malloc(30);
 	UartOutput(ir_data);
+	
+	translateCmd(ir_data.cmd, str);
+	
+	LCDGotoXY(0,0);
+	LCDDispString(str);	
+	
+	free(str);
 }
 
 void UartOutput(IR_TRANSMISION_DATA_S ir_data)

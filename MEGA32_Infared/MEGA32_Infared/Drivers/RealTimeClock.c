@@ -103,11 +103,11 @@ void RTCInit()
 {
 	SPI_MasterInit();
 	
-	DDRB = 1<<4;
+	//DDRB = 1<<4;
 	//Unlock clock, bit 7 = clock, 6 = lock
-	WriteData(0x8F, 0b00000000);
-	//Starts clock
-	WriteData(0x8F, 0b00000000);
+	//WriteData(0x8F, 0b00000000);
+	////Starts clock
+	//WriteData(0x8F, 0b00000000);
 }
 
 // Sets clock registers according to the parameters 

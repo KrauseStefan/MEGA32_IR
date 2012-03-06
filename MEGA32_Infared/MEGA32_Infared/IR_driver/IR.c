@@ -10,12 +10,6 @@
 #include <limits.h>
 #include <stdio.h>
 
-#define LED_DEBUG
-#ifdef LED_DEBUG
-	#include "../Drivers/led.h"
-	unsigned char led = 0;
-#endif
-
 #define INPUT_INTERRUPT				INT0
 #define INPUT_PIN					((PIND & (1 << PIND2)) >> PIND2)  // returns either 0 or 4 PIND2
 #define ENABLE_INPUT_INTERRUPT		GICR |= (0b00000001 << INT0) // 6
@@ -37,19 +31,13 @@ int three_quarter_bit_time;
 
 IR_TRANSMISION_DATA_S ir_data;
 
-
-
 bool first_start_bit;
 
 void copyData();
 bool splitResult(char *rawInput, char * address, char *command, bool *heldDown);
 
 void ir_init()
-{
-
-	DDRA = 0xFF;
-	PORTA = 0xFF;
-	
+{	
 	//Setup interrupt	
 	if(INPUT_INTERRUPT == INT0)
 	{
@@ -69,14 +57,7 @@ void ir_init()
 	TCCR0 = 0b00000011;
 	
 	inputs[24] = 0;
-	inputData[24] = 0;
-	
-#ifdef LED_DEBUG
-	initLEDport(led);
-	led++;
-	writeLEDpattern(led);
-	led = 0;
-#endif
+	inputData[24] = 0;	
 }
 
 void ir_receive(IR_TRANSMISION_DATA_S* _ir_data)
@@ -112,34 +93,28 @@ ISR (INT0_vect)
 }
 
 ISR (TIMER0_COMP_vect)
-{
-	PORTA = 0x00;
-	
+{	
 	TIMER0_COUNT_REG = 0;
 	TIMER0_COMP_REG = half_bit_time;
 	
 	// 48 is to make it 0 or 1 in asci
-	inputs[meaurering_count] = INPUT_PIN + 48;
+	inputs[meaurering_count] = (!INPUT_PIN) + '0';
 
 	meaurering_count++;
 	
 	if(meaurering_count > NUMBER_OF_MEASURINGS - 1)
 	{
-		PORTB++;
 		meaurering_count = 0;
 		ENABLE_INPUT_INTERRUPT;
 		DISABLE_TIMER0_COMP_INT;
 		sei();
 		
-		PORTB++;
 		splitResult(inputs, &ir_data.adr, &ir_data.cmd, &ir_data.hold_bit );
 		ir_receive_event(ir_data);
 		
 		copyData();
 		ir_receive_input(inputs);
 	}
-
-	PORTA = 0xFF;
 }
 
 ISR (TIMER0_OVF_vect)
@@ -172,35 +147,38 @@ bool splitResult(char *rawInput, char * address, char *command, bool *heldDown){
 	
 	*address = 0;
 	*command = 0;
-	int i = 1;
+	int index = 1;
 	while(1){
-		if(rawInput[i -1] == rawInput[i]){
+		
+		//If previus bit was equal to current bit we have an error
+		if(rawInput[index -1] == rawInput[index]){
 			error = true;
 		}
-	
-		if(i >= cmdStart && i < end){
-			*command = (*command) * 2;
-			if(rawInput[i] != '0'){
-				*command += 1;
+		
+		// read Command bits
+		if(index >= cmdStart && index < end){
+			*command = (*command) << 1;
+			if(rawInput[index] != '0'){
+				*command |= 1;
 			}		
 
-		}else if(i >= addressStart && i < cmdStart){
-			*address = (*address) * 2;
-			if(rawInput[i] != '0'){
-				*address += 1;
+		}else if(index >= addressStart && index < cmdStart){
+			*address = (*address) << 1;
+			if(rawInput[index] != '0'){
+				*address |= 1;
 			}
 		
-		}else if(i >= start && i < addressStart){
-			if(rawInput[i] == lastHeldDown){
+		}else if(index >= start && index < addressStart){
+			if(rawInput[index] == lastHeldDown){
 				*heldDown = true;
 			}else{
-				lastHeldDown = rawInput[i];
+				lastHeldDown = rawInput[index];
 				*heldDown = false;
 			}		
 		}else
 			break;
 			
-		i += 2;
+		index += 2;
 	}
 	
 	return error;
@@ -208,38 +186,35 @@ bool splitResult(char *rawInput, char * address, char *command, bool *heldDown){
 
 
 void translateCmd(char cmd, char *output){
-	if(cmd >= 54 && cmd <= 63){
-		char number = ((signed int)cmd - 63) * -1;
-//		char number = (signed int)cmd;
-		sprintf(output, "%i", number);
-//		output[0] = itoa((char)number, output, 10);		
+	if(cmd >= 0 && cmd <= 9){
+		sprintf(output, "%i", cmd);
 		return;
 	}
 	
 	
 	switch(cmd){
-		case 47:
+		case 16:
 			strcpy(output, "Vol up");
 			break;
-		case 46:
+		case 17:
 			strcpy(output, "Vol down");
 			break;
-		case 31:
+		case 32:
 			strcpy(output, "Channal up");
 			break;
-		case 30:
+		case 33:
 			strcpy(output, "Channal down");
 			break;
-		case 51:
+		case 12:
 			strcpy(output, "Power");
 			break;
-		case 50:
+		case 13:
 			strcpy(output, "Mute");
 			break;
-		case 49:
+		case 14:
 			strcpy(output, "PP");
 			break;
-		case 48:
+		case 15:
 			strcpy(output, "Plus in a frame");
 			break;
 		default:
