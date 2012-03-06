@@ -12,8 +12,8 @@
 #include <avr/io.h>
 #include "led.h"
 #define MAX_LED_NR 7
-#define LED_DDR DDRB
-#define LED_PORT PORTB
+#define LED_DDR DDRA
+#define LED_PORT PORTA
 
 void initLEDport(unsigned char init_pattern)
 {
