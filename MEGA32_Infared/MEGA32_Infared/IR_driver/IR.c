@@ -10,16 +10,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-<<<<<<< HEAD
 #define LED_DEBUG
-=======
-#define PRINT_DEBUG
-#ifdef PRINT_DEBUG
-	#include "../Drivers/uart.h"
-#endif
-
->>>>>>> 9ca087fcfe2111e8394aa1bd97beab9cea6634d5
-
 #ifdef LED_DEBUG
 	#include "../Drivers/led.h"
 	unsigned char led = 0;
@@ -51,6 +42,7 @@ IR_TRANSMISION_DATA_S ir_data;
 bool first_start_bit;
 
 void copyData();
+bool splitResult(char *rawInput, char * address, char *command, bool *heldDown);
 
 void ir_init()
 {
@@ -75,6 +67,9 @@ void ir_init()
 	// Normal mode
 	// Normal compare mode
 	TCCR0 = 0b00000011;
+	
+	inputs[24] = 0;
+	inputData[24] = 0;
 	
 #ifdef LED_DEBUG
 	initLEDport(led);
@@ -124,13 +119,22 @@ ISR (TIMER0_COMP_vect)
 	TIMER0_COMP_REG = half_bit_time;
 	
 	// 48 is to make it 0 or 1 in asci
-	inputs[meaurering_count++] = INPUT_PIN+48;
+	inputs[meaurering_count] = INPUT_PIN + 48;
 
-	if(meaurering_count > NUMBER_OF_MEASURINGS-1)
+	meaurering_count++;
+	
+	if(meaurering_count > NUMBER_OF_MEASURINGS - 1)
 	{
+		PORTB++;
 		meaurering_count = 0;
 		ENABLE_INPUT_INTERRUPT;
 		DISABLE_TIMER0_COMP_INT;
+		sei();
+		
+		PORTB++;
+		splitResult(inputs, &ir_data.adr, &ir_data.cmd, &ir_data.hold_bit );
+		ir_receive_event(ir_data);
+		
 		copyData();
 		ir_receive_input(inputs);
 	}
@@ -155,4 +159,92 @@ void copyData()
 	{
 		inputData[i] = inputs[i];
 	}
+}
+
+bool splitResult(char *rawInput, char * address, char *command, bool *heldDown){
+	const int start = 0;
+	const int addressStart = 2;
+	const int cmdStart = addressStart + 10;
+	const int end = cmdStart + 12;
+	static char lastHeldDown = '0';
+	
+	bool error = false;
+	
+	*address = 0;
+	*command = 0;
+	int i = 1;
+	while(1){
+		if(rawInput[i -1] == rawInput[i]){
+			error = true;
+		}
+	
+		if(i >= cmdStart && i < end){
+			*command = (*command) * 2;
+			if(rawInput[i] != '0'){
+				*command += 1;
+			}		
+
+		}else if(i >= addressStart && i < cmdStart){
+			*address = (*address) * 2;
+			if(rawInput[i] != '0'){
+				*address += 1;
+			}
+		
+		}else if(i >= start && i < addressStart){
+			if(rawInput[i] == lastHeldDown){
+				*heldDown = true;
+			}else{
+				lastHeldDown = rawInput[i];
+				*heldDown = false;
+			}		
+		}else
+			break;
+			
+		i += 2;
+	}
+	
+	return error;
+}
+
+
+void translateCmd(char cmd, char *output){
+	if(cmd >= 54 && cmd <= 63){
+		char number = ((signed int)cmd - 63) * -1;
+//		char number = (signed int)cmd;
+		sprintf(output, "%i", number);
+//		output[0] = itoa((char)number, output, 10);		
+		return;
+	}
+	
+	
+	switch(cmd){
+		case 47:
+			strcpy(output, "Vol up");
+			break;
+		case 46:
+			strcpy(output, "Vol down");
+			break;
+		case 31:
+			strcpy(output, "Channal up");
+			break;
+		case 30:
+			strcpy(output, "Channal down");
+			break;
+		case 51:
+			strcpy(output, "Power");
+			break;
+		case 50:
+			strcpy(output, "Mute");
+			break;
+		case 49:
+			strcpy(output, "PP");
+			break;
+		case 48:
+			strcpy(output, "Plus in a frame");
+			break;
+		default:
+			sprintf(output, "Undefined value: %i", cmd);		
+			return;
+	}
+//	return output;
 }

@@ -29,8 +29,8 @@ int main(void)
 	DDRD = 0b00000010;
 	ir_init();
 	InitUART(9600,8);
-	char * test = "HEJ med dig";
-	printf(test);
+	//char * test = "HEJ med dig";
+	//printf(test);
 	ir_receive_event = &input_handler;
 	ir_error_msg = &ErrorData;
 	ir_receive_input = &inputTest;
@@ -45,7 +45,10 @@ int main(void)
 
 void inputTest(char* input)
 {
-	SendString(input, -1);
+	//SendString("string length is: ", -1);
+	//SendInteger(strlen(input));
+	//SendString("\n", -1);
+	//SendString(input, -1);
 }
 
 void ErrorData(char* message)
@@ -60,10 +63,14 @@ void input_handler(IR_TRANSMISION_DATA_S ir_data)
 
 void UartOutput(IR_TRANSMISION_DATA_S ir_data)
 {
+	char *commandStr = malloc(50);
+	translateCmd(ir_data.cmd, commandStr);
+	
 	SendString("\n\rAdr: ", -1);
 	SendInteger(ir_data.adr);
 	SendString("\n\rCommand: ", -1);
-	SendInteger(ir_data.cmd);
+	SendString(commandStr, -1);
+	//SendInteger(ir_data.cmd);
 	SendString("\n\rBit hold: ", -1);
 	if(ir_data.hold_bit == false)
 	{
@@ -74,4 +81,5 @@ void UartOutput(IR_TRANSMISION_DATA_S ir_data)
 		SendString("Button has been hold\n\r", -1);
 	}
 	
+	free(commandStr);
 }
