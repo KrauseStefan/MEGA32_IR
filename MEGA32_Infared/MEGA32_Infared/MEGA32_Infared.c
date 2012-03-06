@@ -18,6 +18,7 @@
 
 #include "IR_driver/IR.h"
 #include "Drivers/uart.h"
+#include "Drivers/RealTimeClock.h"
 
 void ErrorData(char* message);
 void input_handler(IR_TRANSMISION_DATA_S ir_data);
@@ -26,11 +27,19 @@ void inputTest(char* input);
 
 int main(void)
 {
+	char old_time = 0;
+	char new_time;
+	
 	DDRD = 0b00000010;
+	
 	ir_init();
 	InitUART(9600,8);
-	//char * test = "HEJ med dig";
-	//printf(test);
+	LCDInit();
+	RTCInit();
+	
+	SetClock(11, 5, 25, 5, 15, 35, 6);
+	LCDClear();
+	
 	ir_receive_event = &input_handler;
 	ir_error_msg = &ErrorData;
 	ir_receive_input = &inputTest;
@@ -38,7 +47,19 @@ int main(void)
 	//SendString("IR ready!\n\r");
     while(1)
     {
-				 
+		new_time = Seconds1();
+		if(old_time != new_time){
+			LCDGotoXY(0,1);
+			LCDDispInteger(Hours10());
+			LCDDispInteger(Hours1());
+			LCDDispString(":");
+			LCDDispInteger(Minutes10());
+			LCDDispInteger(Minutes1());
+			LCDDispString(":");
+			LCDDispInteger(Seconds10());
+			LCDDispInteger(Seconds1());
+			old_time = new_time;
+		}	 
     }
 	cli(); // disable global interrupt
 }
