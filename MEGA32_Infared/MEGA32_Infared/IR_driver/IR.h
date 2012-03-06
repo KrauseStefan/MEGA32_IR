@@ -9,8 +9,8 @@
 
 #include <stdbool.h>
 
-char inputData[24];
-char inputs[24];
+char inputData[25]; // last spot is for a termination zero
+char inputs[25];
 
 typedef struct  
 {
@@ -26,5 +26,7 @@ void ir_receive(IR_TRANSMISION_DATA_S* ir_data);
 void (*ir_receive_event)(IR_TRANSMISION_DATA_S ir_data);
 void (*ir_error_msg)(char* message);
 void (*ir_receive_input)(char* input);
+
+void translateCmd(char cmd, char *output);
 
 #endif
