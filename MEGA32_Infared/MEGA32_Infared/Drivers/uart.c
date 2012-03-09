@@ -23,7 +23,7 @@ static char inputNum = 0;
 static char sendNum = 0;
 static char sendCharCount = 0;
 
-void USART_TX_Routine(char val){
+void UART_TX_Routine(char val){
 
     // Send the character pointed to by "String"
     SendChar(val);
@@ -37,7 +37,7 @@ ISR(USART_TXC_vect){
    
   if(val != 0)
   {
-	  USART_TX_Routine(val);      
+	  UART_TX_Routine(val);      
   }else{
     SendChar(0);
 	sendCharCount = 0;
@@ -148,7 +148,7 @@ void SendString(char* String, int length)
 	
   if(!(UCSRB & (1 << TXCIE))){
     UCSRB |= (1 << TXCIE); // enable TX interrupt.    
-	USART_TX_Routine(strBuffer[inputNum][0]);
+	UART_TX_Routine(strBuffer[inputNum][0]);
   }  
   
   inputNum++;
