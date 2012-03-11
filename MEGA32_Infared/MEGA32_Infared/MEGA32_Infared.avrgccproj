@@ -15,7 +15,7 @@
     </ToolchainDirPath>
     <MakeDirPath>
     </MakeDirPath>
-    <GlobalToolchainPath>D:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
+    <GlobalToolchainPath>C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
     <AvrGccProjectExtensions>
     </AvrGccProjectExtensions>
     <AssemblyName>MEGA32_Infared</AssemblyName>

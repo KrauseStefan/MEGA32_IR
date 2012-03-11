@@ -24,7 +24,7 @@
 #define TIMER0_COMP_REG				OCR0
 
 #define NUMBER_OF_MEASURINGS		24
-int meaurering_count; // measurements
+int measurering_count; // measurements
 
 int half_bit_time;
 int three_quarter_bit_time;
@@ -85,7 +85,7 @@ ISR (INT0_vect)
 		three_quarter_bit_time = (bit_time/4.0*3.0);
 
 		TIMER0_COMP_REG = three_quarter_bit_time;
-		meaurering_count = 0;
+		measurering_count = 0;
 		ENABLE_TIMER0_COMP_INT;
 		DISABLE_INPUT_INTERRUPT;
 		first_start_bit = true;
@@ -98,13 +98,13 @@ ISR (TIMER0_COMP_vect)
 	TIMER0_COMP_REG = half_bit_time;
 	
 	// 48 is to make it 0 or 1 in asci
-	inputs[meaurering_count] = (!INPUT_PIN) + '0';
+	inputs[measurering_count] = (!INPUT_PIN) + '0';
 
-	meaurering_count++;
+	measurering_count++;
 	
-	if(meaurering_count > NUMBER_OF_MEASURINGS - 1)
+	if(measurering_count > NUMBER_OF_MEASURINGS - 1)
 	{
-		meaurering_count = 0;
+		measurering_count = 0;
 		ENABLE_INPUT_INTERRUPT;
 		DISABLE_TIMER0_COMP_INT;
 		sei(); // re enable interrupts from here on the code is not considered high priority.
@@ -119,10 +119,6 @@ ISR (TIMER0_COMP_vect)
 
 ISR (TIMER0_OVF_vect)
 {
-	if (*ir_error_msg != NULL)
-	{
-		ir_error_msg("\n\rTime out\n\r");
-	}
 	first_start_bit = true;
 	DISABL_TIMER0_OVERFLOW_INT;	
 }
