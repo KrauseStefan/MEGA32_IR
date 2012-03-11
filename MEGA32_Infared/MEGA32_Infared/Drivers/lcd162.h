@@ -16,7 +16,8 @@
   DB6 (pin 13) ---   bit 6
   DB7 (pin 14) ---   bit 7
 
-  Henning Hargaard, January 9, 2012
+  Based on Henning Hargaards template,
+  Implemented by Vinnie Juul and Stefan Krause-Kjær 
 -----------------------------------------------------------------------*/
 
 // Defining the used PORT:

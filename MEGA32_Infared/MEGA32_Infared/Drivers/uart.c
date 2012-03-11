@@ -6,7 +6,8 @@
 *  RXD = PORTD, bit0                              *
 *  TXD = PORTD, bit1                              *
 *                                                 *
-* Henning Hargaard, 1/11 2011                     *
+  Based on Henning Hargaards template,
+  Implemented by Vinnie Juul and Stefan Krause-Kjær 
 ***************************************************/
 #include <avr/io.h>
 #include <stdlib.h>

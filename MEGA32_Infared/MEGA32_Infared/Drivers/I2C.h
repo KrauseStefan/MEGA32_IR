@@ -2,7 +2,7 @@
  * I2C.c
  *
  * Created: 17-02-2012 13:47:45
- *  Author: Vinnie Juul
+ *  Author: Vinnie Juul and Stefan Krause-Kjær
  */ 
 
 #include <avr/io.h>

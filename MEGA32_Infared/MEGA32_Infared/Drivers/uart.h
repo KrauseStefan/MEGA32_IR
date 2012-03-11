@@ -1,7 +1,9 @@
 /**************************************
 * "uart.h":                           *
 * Header file for Mega32 UART driver. *
-* Henning Hargaard, 1/11 2011         *
+
+  Based on Henning Hargaards template,
+  Implemented by Vinnie Juul and Stefan Krause-Kjær 
 ***************************************/ 
 void InitUART(unsigned long BaudRate, unsigned char DataBit);
 unsigned char CharReady();

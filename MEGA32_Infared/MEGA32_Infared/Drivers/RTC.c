@@ -1,9 +1,3 @@
-/*
- * RTC.c
- *
- * Created: 03-02-2012 13:52:30
- *  Author: Vinnie Juul
- */ 
 #include <avr/io.h>
 #include "RTC.h"
 #include <avr/delay.h>

@@ -12,7 +12,8 @@
   MISO=PB.6    SO 
   SCK=PB.7     CLK
 
-  Henning Hargaard, January 11, 2012
+  Based on Henning Hargaards template,
+  Implemented by Vinnie Juul and Stefan Krause-Kjær 
 -----------------------------------------------------------------------*/
 #define RTC_CONTROL_WRITE 0x8F
 #define RTC_CONTROL_READ 0x0F
