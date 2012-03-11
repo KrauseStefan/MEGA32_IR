@@ -5,7 +5,7 @@
  *  Author: Vinnie Juul
  */ 
 #include <avr/io.h>
-#include "RealTimeClock.h"
+#include "RTC.h"
 #include <avr/delay.h>
 
 void WriteData(unsigned char addr, unsigned char data)

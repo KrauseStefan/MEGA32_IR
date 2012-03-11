@@ -18,7 +18,7 @@
 
 #include "IR_driver/IR.h"
 #include "Drivers/uart.h"
-#include "Drivers/RealTimeClock.h"
+#include "Drivers/RTC.h"
 
 void ErrorData(char* message);
 void input_handler(IR_TRANSMISION_DATA_S ir_data);

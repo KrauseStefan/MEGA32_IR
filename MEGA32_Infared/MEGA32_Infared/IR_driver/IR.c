@@ -107,7 +107,7 @@ ISR (TIMER0_COMP_vect)
 		meaurering_count = 0;
 		ENABLE_INPUT_INTERRUPT;
 		DISABLE_TIMER0_COMP_INT;
-		sei();
+		sei(); // re enable interrupts from here on the code is not considered high priority.
 		
 		splitResult(inputs, &ir_data.adr, &ir_data.cmd, &ir_data.hold_bit );
 		ir_receive_event(ir_data);

@@ -80,10 +80,10 @@
     <Compile Include="Drivers\led.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Drivers\RealTimeClock.c">
+    <Compile Include="Drivers\RTC.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Drivers\RealTimeClock.h">
+    <Compile Include="Drivers\RTC.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drivers\uart.c">
